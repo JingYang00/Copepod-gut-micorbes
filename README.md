@@ -12,4 +12,4 @@ asv_aa_at_all.R showed the changes of copepod GMC at ASV level in response to to
 dino_16s_relative_abundance.R showed copepod GMC composition based on 16s rDNA sequencing.
 distinct ASVs between treatment.R is about the disimilarity of two copepods under different diets.
 
-I am looking forward to consulting and discussing my codes with you all!
+I am looking forward to consulting and discussing my codes with you all! 
