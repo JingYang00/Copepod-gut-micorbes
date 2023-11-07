@@ -4,7 +4,7 @@ Author: Jing Yang
 
 Email: jyangcm@connect.ust.hk
 
-Department of Ocean Science, the Hong Kong University of Science and Technology, Hong Kong SAR, China
+Department of Ocean Science, The Hong Kong University of Science and Technology, Hong Kong SAR, China
 
 alpha_beta.R showed the alpha diversity and beta diversity of copepod GMC.
 
