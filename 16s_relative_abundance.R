@@ -11,6 +11,7 @@ com = rrarefy(com, depth)
 com = com/depth
 
 # sort most abundant groups -----------------------------------------------
+
 com1 = com %>% colSums() %>% sort(decreasing = TRUE) %>% .[1:10] %>% data.frame()
 com1 %>% rownames()
 m <- match(rownames(com1), colnames(com))
