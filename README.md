@@ -14,7 +14,7 @@ Department of Ocean Science, The Hong Kong University of Science and Technology,
 
 alpha_beta_diversity.R showed the alpha diversity and beta diversity of copepod GMC, and the disimilarity of two copepods under different diets.
 
-distinct ASVs between two groups.R showed the significant changes of copepod GMC at ASV level in response to toxic algal diets.
+distinct_ASVs_between_two_groups.R showed the significant changes of copepod GMC at ASV level in response to toxic algal diets.
 
 
 I am looking forward to consulting and discussing my codes with you all!
