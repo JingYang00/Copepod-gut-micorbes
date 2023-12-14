@@ -6,13 +6,17 @@ library(ggpubr)
 library(vegan)
 
 # ### distinct ASVs between treatment ---------------------------------------
+
 tax = read.delim("taxonomy.tsv") %>% as_tibble()
 #tax[(str_detect(tax$Taxon,"Chloroplast")|str_detect(tax$Taxon,"Mitochondria")),] %>% as_tibble() %>% pull(Taxon) %>% length()
 tax1 = tax[!(str_detect(tax$Taxon,"Chloroplast")|str_detect(tax$Taxon,"Mitochondria")),]
 
 asv_table = df1[match(tax$Feature.ID,rownames(df1)),] %>% t()
 asv_table1 = df1[match(tax1$Feature.ID,rownames(df1)),] %>% t()
+
+
 # rarefy to same depth ----------------------------------------------------
+
 asv_table = asv_table[which(rowSums(asv_table)>1000),]
 asv_table = rrarefy(asv_table, min(rowSums(asv_table)))
 asv_table = asv_table[,which(colSums(asv_table)>0)]
@@ -29,9 +33,8 @@ asv_table1 = asv_table1[!str_detect(rownames(asv_table1),"d7"),]
 
 
 
-
-
 ## Acartia. ASV level
+
 asv_acar = asv_table[str_detect(rownames(asv_table), "Acar"),]
 asv_acar = rrarefy(asv_acar, min(rowSums(asv_acar)))
 asv_acar_ra = asv_acar/min(rowSums(asv_acar))
@@ -91,7 +94,9 @@ write_csv(acar_aa_at_up,"acar_aa_at_up.csv")
 write_csv(acar_aa_at_down,"acar_aa_at_down.csv")
 
 
-# para
+
+
+# Paracalanus. ASV level
 
 asv_para = asv_table1[str_detect(rownames(asv_table1), "Para"),]
 asv_para = rrarefy(asv_para, min(rowSums(asv_para)))
