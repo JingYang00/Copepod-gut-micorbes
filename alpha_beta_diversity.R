@@ -8,10 +8,9 @@ tax = read.delim("taxonomy.tsv") %>% as_tibble()
 tax1 = tax[!(str_detect(tax$Taxon,"Chloroplast")|str_detect(tax$Taxon,"Mitochondria")),]
 
 asv_table = df[match(tax1$Feature.ID,rownames(df)),] %>% t()
-asv_table = asv_table[which(rowSums(asv_table)>1000),]
 asv_table = asv_table[,which(colSums(asv_table)>0)]
 asv_table = asv_table[!str_detect(rownames(asv_table),"d7"),]
-
+asv_table = rrarefy(asv_table, min(rowSums(asv_table)))
 
 
 # alpha diversity dataframe---------------------------------------------------------
@@ -106,26 +105,105 @@ ggarrange(qshannona, qshannonp, qrichnessa, qrichnessp, ncol = 2, nrow = 2)
 grp_cop <- data.frame(Sample = rownames(asv_table)) %>% 
   mutate(Copepod = Sample %>% str_split("_") %>% sapply('[',1))
 dd = vegdist(asv_table)
-anosim(dd,grp_cop$Copepod) # R: 0.8234, Significance: 0.001
+anosim(dd,grp_cop$Copepod) # R: 0.8278, Significance: 0.001
 
+##Diet
+grp_diet <- data.frame(Sample = rownames(asv_table)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2))
+d0 = vegdist(asv_table)
+anosim(d0,grp_diet$Alage) # R: 0.1122, Significance: 0.005
 
-##Acartia
+##Acartia 
 df_acar = asv_table[str_detect(rownames(asv_table),"Acar"),]
 grp_acar <- data.frame(Sample = rownames(df_acar)) %>% 
   mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2))
-
 d1 = vegdist(df_acar)
-anosim(d1, grp_acar$Alage) # R: 0.3626, Significance: 0.001
-
+anosim(d1, grp_acar$Alage) # R: 0.3615, Significance: 0.001
 
 ##Paracalanus
 df_para = asv_table[str_detect(rownames(asv_table),"Para"),]
 grp_para <- data.frame(Sample = rownames(df_para)) %>% 
   mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2))
-
 d2 = vegdist(df_para) 
-anosim(d2, grp_para$Alage) # R: 0.3456, Significance: 0.001
+anosim(d2, grp_para$Alage) # R: 0.3752, Significance: 0.001
 
+##Diet (Aa vs. At)
+grp_diet1 <- data.frame(Sample = rownames(asv_table)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(asv_table),"sw"))
+asv_table1 = asv_table[!str_detect(rownames(asv_table),"sw"),]
+d0 = vegdist(asv_table1)
+anosim(d0,grp_diet1$Alage) # R: 0.101, Significance: 0.023
+
+##Acartia (Aa vs. At) 
+df_acar1 = asv_table[str_detect(rownames(asv_table),"Acar"),]
+grp_acar1 <- data.frame(Sample = rownames(df_acar1)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_acar1),"sw"))
+df_acar1 = df_acar1[!str_detect(rownames(df_acar1),"sw"),]
+d1 = vegdist(df_acar1)
+anosim(d1, grp_acar1$Alage) # R: 0.4006, Significance: 0.001
+
+##Paracalanus (Aa vs. At)
+df_para1 = asv_table[str_detect(rownames(asv_table),"Para"),]
+grp_para1 <- data.frame(Sample = rownames(df_para1)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_para1),"sw"))
+df_para1 = df_para1[!str_detect(rownames(df_para1),"sw"),]
+d2 = vegdist(df_para1) 
+anosim(d2, grp_para1$Alage) # R: 0.299, Significance: 0.007
+
+##Diet (Field vs. At)
+grp_diet2 <- data.frame(Sample = rownames(asv_table)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(asv_table),"aa"))
+asv_table2 = asv_table[!str_detect(rownames(asv_table),"aa"),]
+d0 = vegdist(asv_table2)
+anosim(d0,grp_diet2$Alage) # R: 0.1249, Significance: 0.007
+
+##Acartia (Field vs. At)
+df_acar2 = asv_table[str_detect(rownames(asv_table),"Acar"),]
+grp_acar2 <- data.frame(Sample = rownames(df_acar2)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_acar2),"aa"))
+df_acar2 = df_acar2[!str_detect(rownames(df_acar),"aa"),]
+d1 = vegdist(df_acar2)
+anosim(d1, grp_acar2$Alage) # R: 0.4571, Significance: 0.001
+
+##Paracalanus (Field vs. At)
+df_para2 = asv_table[str_detect(rownames(asv_table),"Para"),]
+grp_para2 <- data.frame(Sample = rownames(df_para2)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_para2),"aa"))
+df_para2 = df_para2[!str_detect(rownames(df_para),"aa"),]
+d2 = vegdist(df_para2) 
+anosim(d2, grp_para2$Alage) # R: 0.4634, Significance: 0.001
+
+##Diet (Field vs. Aa)
+grp_diet3 <- data.frame(Sample = rownames(asv_table)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(asv_table),"at"))
+asv_table3 = asv_table[!str_detect(rownames(asv_table),"at"),]
+d0 = vegdist(asv_table3)
+anosim(d0,grp_diet3$Alage) # R: 0.1187, Significance: 0.014
+
+##Acartia (Field vs. Aa)
+df_acar3 = asv_table[str_detect(rownames(asv_table),"Acar"),]
+grp_acar3 <- data.frame(Sample = rownames(df_acar3)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_acar3),"at"))
+df_acar3 = df_acar3[!str_detect(rownames(df_acar),"at"),]
+d1 = vegdist(df_acar3)
+anosim(d1, grp_acar3$Alage) # R: 0.3349, Significance: 0.011
+
+##Paracalanus (Field vs. Aa)
+df_para3 = asv_table[str_detect(rownames(asv_table),"Para"),]
+grp_para3 <- data.frame(Sample = rownames(df_para3)) %>% 
+  mutate(Alage= Sample %>% str_split("_") %>% sapply('[',2)) %>% 
+  filter(!str_detect(rownames(df_para3),"at"))
+df_para3 = df_para3[!str_detect(rownames(df_para),"at"),]
+d2 = vegdist(df_para3) 
+anosim(d2, grp_para3$Alage) # R: 0.4114, Significance: 0.001
 
 
 # beta diversity of Acartia----------------------------------------------------------
@@ -148,12 +226,12 @@ pa <- dfa %>%
   theme_classic()+
   theme(panel.border = element_rect(fill=NA,color="black", size=2, linetype="solid"),
         title = element_text(color="black", size=15),
-        legend.title=element_blank(), 
-        legend.text=element_text(size=17),
+        legend.position = 'none',
         axis.title=element_text(size=17),
         axis.text = element_text(color="black", size=17))+
   stat_ellipse(aes(color = Source),level=0.6)
 pa
+
 
 # beta diversity of Paracalanus -------------------------------------------
 
@@ -176,14 +254,13 @@ pp <- dfp %>%
   theme_classic()+
   theme(panel.border = element_rect(fill=NA,color="black", size=2, linetype="solid"),
         title = element_text(color="black", size=15),
-        legend.title=element_blank(), 
-        legend.text=element_text(size=17),
+        legend.position = 'none',
         axis.title=element_text(size=17),
         axis.text = element_text(color="black", size=17))+
   stat_ellipse(aes(color = Source),level=0.6)
 pp
 
-ggarrange(pa,pp, common.legend = TRUE, legend = "right")
+ggarrange(NULL,pa,NULL,pp,NULL,ncol=5,widths=c(0.05,1,0.2,1,0.05))
 
 
 # beta-comparison ---------------------------------------------------------
@@ -214,7 +291,7 @@ d4 = vegdist(Para_sw)
 d5 = vegdist(Para_aa)
 d6 = vegdist(Para_at)
 
-df = data.frame(Dissimilarity = c(d1,d2,d3,d4,d5,d6), 
+df1 = data.frame(Dissimilarity = c(d1,d2,d3,d4,d5,d6), 
                 Treatment = c(rep("Acar_sw", length(d1)),
                               rep("Acar_aa", length(d2)),
                               rep("Acar_at", length(d3)),
@@ -222,7 +299,7 @@ df = data.frame(Dissimilarity = c(d1,d2,d3,d4,d5,d6),
                               rep("Para_aa", length(d5)),
                               rep("Para_at", length(d6))))
   
-df %>% 
+df1 %>% 
   mutate(Algae = Treatment %>% str_split("_") %>% sapply('[',2) %>%
            str_replace_all(c('aa'="Non-toxic algae",'at'="Toxic algae")) %>%
            str_replace('sw',"Field")) %>% 
